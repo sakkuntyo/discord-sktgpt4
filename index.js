@@ -10,6 +10,16 @@ let DISCORD_TOKEN = ""
 let DISCORD_CLIENT_ID = ""
 let CHATGPT_TOKEN = ""
 
+let chatHistories = [];
+function saveChatHistory(role,message){
+  chatHistories.push({
+    role: role,
+    message: message,
+    timestamp: new Date()
+  })
+}
+
+
 const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
 
 (async () => {
@@ -55,18 +65,19 @@ client.on('interactionCreate', async interaction => {
   }
   if (interaction.isModalSubmit()){
     const value = interaction.fields.getTextInputValue('questionsInput');
+    saveChatHistory("user",value);
     await interaction.deferReply("chatgpt is thinking...");
     
     let data = {
       model:"gpt-3.5-turbo",
       messages: [
-        {
-          role:"user",
-          content:value
-        }
       ],
       temperature:0.7
     }
+
+    chatHistories.forEach((history) => {
+      data.messages.push({role:history.role,content:history.message})
+    })
 
     let headers = {
       "Content-Type":'application/json',
@@ -74,9 +85,12 @@ client.on('interactionCreate', async interaction => {
     }
 
     var gptres = await axios.post("https://api.openai.com/v1/chat/completions", data, {headers: headers})
-    var message = `> ${value}\n` +
-		  gptres.data.choices[0].message.content;
+    var gptresponse = gptres.data.choices[0].message.content;
+    saveChatHistory("assistant",gptresponse)
+    var message = `> ${value}\n` + gptresponse;
     await interaction.followUp(message);
+
+    console.log(chatHistories)
   }
 });
 
