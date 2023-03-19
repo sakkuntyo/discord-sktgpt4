@@ -42,8 +42,8 @@ client.on('interactionCreate', async interaction => {
   if (interaction.isChatInputCommand()){
     if (interaction.commandName === 'gpt35') {
       const modal = new ModalBuilder()
-        .setCustomId('myModal')
-        .setTitle('My Modal');
+        .setCustomId('gpt35')
+        .setTitle('gpt35');
       const hobbiesInput = new TextInputBuilder()
         .setCustomId('questionsInput')
         .setLabel("please type your request for chatgpt")
@@ -55,7 +55,7 @@ client.on('interactionCreate', async interaction => {
   }
   if (interaction.isModalSubmit()){
     const value = interaction.fields.getTextInputValue('questionsInput');
-    //await interaction.deferReply("chatgpt is thinking...aaa");
+    await interaction.deferReply("chatgpt is thinking...");
     
     let data = {
       model:"gpt-3.5-turbo",
@@ -74,9 +74,14 @@ client.on('interactionCreate', async interaction => {
     }
 
     var gptres = await axios.post("https://api.openai.com/v1/chat/completions", data, {headers: headers})
-    var message = value + "\n" +
-		  gptres.data.choices[0].message.content
-    await interaction.reply(message);
+    console.dir(gptres);
+    console.dir(gptres.data);
+    console.dir(gptres.data.choices[0]);
+    console.dir(gptres.data.choices[0].message);
+    console.dir(gptres.data.choices[0].message.content);
+    var message = `> ${value}\n` +
+		  gptres.data.choices[0].message.content.replace("\n","");
+    await interaction.followUp(message);
   }
 });
 
