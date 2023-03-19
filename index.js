@@ -89,8 +89,6 @@ client.on('interactionCreate', async interaction => {
     saveChatHistory("assistant",gptresponse)
     var message = `> ${value}\n` + gptresponse;
     await interaction.followUp(message);
-
-    console.log(chatHistories)
   }
 });
 
