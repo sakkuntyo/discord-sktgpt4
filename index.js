@@ -80,7 +80,7 @@ client.on('interactionCreate', async interaction => {
     console.dir(gptres.data.choices[0].message);
     console.dir(gptres.data.choices[0].message.content);
     var message = `> ${value}\n` +
-		  gptres.data.choices[0].message.content.replace("\n","");
+		  gptres.data.choices[0].message.content;
     await interaction.followUp(message);
   }
 });
