@@ -74,11 +74,6 @@ client.on('interactionCreate', async interaction => {
     }
 
     var gptres = await axios.post("https://api.openai.com/v1/chat/completions", data, {headers: headers})
-    console.dir(gptres);
-    console.dir(gptres.data);
-    console.dir(gptres.data.choices[0]);
-    console.dir(gptres.data.choices[0].message);
-    console.dir(gptres.data.choices[0].message.content);
     var message = `> ${value}\n` +
 		  gptres.data.choices[0].message.content;
     await interaction.followUp(message);
