@@ -6,15 +6,16 @@ const commands = [
 		    },
 ];
 
-let TOKEN = ""
-let CLIENT_ID = ""
+let DISCORD_TOKEN = ""
+let DISCORD_CLIENT_ID = ""
+let CHATGPT_TOKEN = ""
 
-const rest = new REST({ version: '10' }).setToken(TOKEN);
+const rest = new REST({ version: '10' }).setToken(DISCORD_TOKEN);
 
 (async () => {
   try {
     console.log('Started refreshing application (/) commands.');
-    await rest.put(Routes.applicationCommands(CLIENT_ID), { body: commands });
+    await rest.put(Routes.applicationCommands(DISCORD_CLIENT_ID), { body: commands });
     console.log('Successfully reloaded application (/) commands.');
   } catch (error) {
     console.error(error);
@@ -31,6 +32,7 @@ const {
   TextInputStyle
 } = require('discord.js');
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const axios = require("axios");
 
 client.on('ready', async () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -49,13 +51,33 @@ client.on('interactionCreate', async interaction => {
       const firstActionRow = new ActionRowBuilder().addComponents(hobbiesInput);
       modal.addComponents(firstActionRow);
       await interaction.showModal(modal);
-      //await interaction.deleteReply();
     }
   }
   if (interaction.isModalSubmit()){
     const value = interaction.fields.getTextInputValue('questionsInput');
-    await interaction.reply(`Your favorite color is ${value}`);
+    //await interaction.deferReply("chatgpt is thinking...aaa");
+    
+    let data = {
+      model:"gpt-3.5-turbo",
+      messages: [
+        {
+          role:"user",
+          content:value
+        }
+      ],
+      temperature:0.7
+    }
+
+    let headers = {
+      "Content-Type":'application/json',
+      "Authorization":`Bearer ${CHATGPT_TOKEN}`
+    }
+
+    var gptres = await axios.post("https://api.openai.com/v1/chat/completions", data, {headers: headers})
+    var message = value + "\n" +
+		  gptres.data.choices[0].message.content
+    await interaction.reply(message);
   }
 });
 
-client.login(TOKEN);
+client.login(DISCORD_TOKEN);
