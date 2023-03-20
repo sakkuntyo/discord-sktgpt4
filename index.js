@@ -64,7 +64,7 @@ client.on('interactionCreate', async interaction => {
     }
   }
   if (interaction.isModalSubmit()){
-    const value = interaction.fields.getTextInputValue('questionsInput');
+    var value = interaction.fields.getTextInputValue('questionsInput');
     saveChatHistory("user",value);
     await interaction.deferReply("chatgpt is thinking...");
     
@@ -87,6 +87,7 @@ client.on('interactionCreate', async interaction => {
     var gptres = await axios.post("https://api.openai.com/v1/chat/completions", data, {headers: headers})
     var gptresponse = gptres.data.choices[0].message.content;
     saveChatHistory("assistant",gptresponse)
+    value = value.replace("\n","\n> ")
     var message = `> ${value}\n` + gptresponse;
     await interaction.followUp(message);
   }
