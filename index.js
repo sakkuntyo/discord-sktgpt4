@@ -1,14 +1,15 @@
 const { REST, Routes } = require('discord.js');
 const commands = [
 	  {
-		      name: 'gpt35',
-		      description: 'chatgpt 3.5 を利用します',
+		      name: 'gpt4',
+		      description: 'chatgpt 4 を利用します',
 		    },
 ];
 
-let DISCORD_TOKEN = ""
-let DISCORD_CLIENT_ID = ""
-let CHATGPT_TOKEN = ""
+require('dotenv').config();
+let DISCORD_TOKEN = process.env.DISCORD_TOKEN;
+let DISCORD_CLIENT_ID = process.env.DISCORD_CLIENT_ID;
+let CHATGPT_TOKEN = process.env.CHATGPT_TOKEN;
 
 let chatHistories = [];
 function saveChatHistory(role,message){
@@ -50,7 +51,7 @@ client.on('ready', async () => {
 
 client.on('interactionCreate', async interaction => {
   if (interaction.isChatInputCommand()){
-    if (interaction.commandName === 'gpt35') {
+    if (interaction.commandName === 'gpt4') {
       const modal = new ModalBuilder()
         .setCustomId('gpt35')
         .setTitle('gpt35');
@@ -69,7 +70,7 @@ client.on('interactionCreate', async interaction => {
     await interaction.deferReply("chatgpt is thinking...");
     
     let data = {
-      model:"gpt-3.5-turbo",
+      model:"gpt-4",
       messages: [
       ],
       temperature:0.7
